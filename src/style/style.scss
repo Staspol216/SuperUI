@@ -1,0 +1,99 @@
+.timeline-container {
+    position: relative;
+
+    margin: 40px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+
+    font-size: 14px;
+}
+
+.timeline-item-content {
+    position: relative;
+    top: -4px;
+    
+    left: 0;
+    
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    text-align: left;
+    word-break: break-word;
+
+}
+
+.timeline-item-right .timeline-item-content {
+    left: calc(50% - 4px);
+    width: calc(50% - 14px);
+    margin: 0 0 0 26px;
+    text-align: left;
+}
+
+.timeline-item-left .timeline-item-content {
+    width: calc(50% - 12px);
+    text-align: right;
+    margin: 0;
+}
+
+
+.timeline-item-tail {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+
+    height: calc(100% - 10px);
+
+    border-left: 2px solid rgba(0,0,0,.06);
+    
+}
+
+.timeline-item-circle {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+
+    width: 10px;
+    height: 10px;
+
+    margin-left: -4px;
+
+    border-radius: 100px;
+    z-index: 100;
+    background-color: #fff;
+    border: 2px solid;
+    border-color: gray;
+    box-sizing: border-box;
+}
+
+.timeline-item-circle-delete {
+    border-color: #ff4d4f;
+}
+.timeline-item-circle-add {
+    border-color: #52c41a;
+}
+.timeline-item-circle-edit {
+    border-color: rgb(194, 191, 22);
+}
+.timeline-item-circle-create {
+    border-color: #1890ff;
+}
+.timeline-item-circle-default {
+    border-color: gray;
+}
+
+
+@media only screen and (max-width: 1023px) {
+    .timeline-item-content {
+        max-width: 100%;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .timeline-item-content .tag {
+        width: calc(100% - 10px);
+    }
+}
