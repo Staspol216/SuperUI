@@ -16,9 +16,10 @@ const App = () => {
           delete: <Smile style={{ fontSize: '14px' }} color="red" />,
           add: <Bolt style={{ fontSize: '14px' }} color="green" />
         }}
-        partDataReload={false}
+        partDataReload={true}
         reverse={false}
         horizontal={true}
+        timelineHorizontalWrap={true}
       />
     </div>
   );

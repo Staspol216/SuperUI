@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import TimelineItem from './TimelineItem';
+import cn from 'classnames';
 
 const Timeline = (props) => {
-    const { position = "left", timelineData = [], partDataReload = false, customDots = {}, reverse = false, horizontal = false } = props;
+    const { position = "left",
+        timelineData = [],
+        partDataReload = false,
+        customDots = {},
+        reverse = false,
+        horizontal = false,
+        timelineHorizontalWrap = false } = props;
 
 
     const [eventsList, setEventsList] = useState([]);
@@ -24,10 +31,14 @@ const Timeline = (props) => {
         setEventsList(eventsList => [...eventsList, ...newEventsList]);
         setEventsEnded(ended);
     }
+    const containerClass = cn("timeline-container", {
+        "timeline-container-horizontal": horizontal,
+        "timeline-wrap": timelineHorizontalWrap && horizontal
+    });
 
     const renderItems = (arr) => {
         return (
-            <ul className={horizontal ? "timeline-container-horizontal" : "timeline-container"}>
+            <ul className={containerClass}>
                 {arr.map((data, idx) => (
                     <TimelineItem position={position} data={data} key={idx} lastItem={(arr.length - 1) === idx} dots={customDots} horizontal={horizontal} />
                 ))}
