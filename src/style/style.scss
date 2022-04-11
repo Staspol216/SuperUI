@@ -9,11 +9,11 @@
   margin: 40px 0 0 0;
   padding: 0;
 
-  white-space: nowrap;
   list-style: none;
 }
 
 .timeline-container-horizontal {
+  white-space: nowrap;
   margin-left: 50px;
 }
 
@@ -167,13 +167,27 @@
 }
 
 .timeline-icon {
+  width: 14px;
+  height: 14px;
+
   display: inline-block;
+  position: relative;
+
   color: inherit;
   font-style: normal;
   line-height: 0;
   text-align: center;
   text-transform: none;
   vertical-align: -0.125em;
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .timeline-item-head-delete {

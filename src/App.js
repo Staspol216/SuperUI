@@ -1,4 +1,4 @@
-import Timeline from "./Timeline";
+import { Timeline } from "./Timeline";
 import timelineData from './database.json';
 import { ReactComponent as ClockIcon } from "./icons/clock.svg";
 import { ReactComponent as Bolt } from "./icons/uil_bolt.svg";
@@ -11,16 +11,18 @@ const App = () => {
       <Timeline
         timelineData={timelineData}
         position={"left"}
-        customDots={{
-          create: <ClockIcon style={{ fontSize: '14px' }} color="blue" />,
-          delete: <Smile style={{ fontSize: '14px' }} color="red" />,
-          add: <Bolt style={{ fontSize: '14px' }} color="green" />
+        dotIcon={{
+          create: <ClockIcon color="blue" />,
+          delete: <Smile color="red" />,
+          add: <Bolt color="green" />
         }}
         partDataReload={true}
         reverse={false}
         horizontal={true}
         timelineHorizontalWrap={true}
-      />
+      >
+        <Timeline.Item type={"edit"} dotIcon={{ delete: <Smile color="red" /> }}>Beer</Timeline.Item>
+      </Timeline>
     </div>
   );
 }
