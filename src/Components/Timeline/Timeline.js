@@ -1,5 +1,7 @@
 import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import cn from 'classnames';
+import './Timeline.scss';
 
 const TimelineContext = createContext();
 
@@ -56,7 +58,7 @@ const Timeline = ({ children, ...props }) => {
 
     let dataItems;
 
-    if (!children) {
+    if (!children && eventsList) {
         dataItems = eventsList.map((data, idx) => (
             <Timeline.JSONItem
                 data={data}
@@ -98,11 +100,15 @@ const Timeline = ({ children, ...props }) => {
 Timeline.JSONItem = function TimelineJSONItem({ data, lastItem }) {
     const { dotIcons } = useTimelineContext();
     const headClass = cn("timeline-item-head", `timeline-item-head-${data.type ? data.type : "default"}`);
+    let itemIcon;
+
+    if (dotIcons) {
+        itemIcon = dotIcons[data.type]
+    }
     return (
         <li className="timeline-item">
             {!lastItem ? <div className="timeline-item-tail"></div> : null}
-            {dotIcons[data?.type] ?
-                <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{dotIcons[data?.type]}</span></div>
+            {itemIcon ? <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{itemIcon}</span></div>
                 : <div className={headClass} />}
             <div className="timeline-item-content">
                 {`${data?.content?.text} ${data?.content?.changes} ${data?.content?.name} ${data?.date}`}
@@ -114,11 +120,14 @@ Timeline.JSONItem = function TimelineJSONItem({ data, lastItem }) {
 Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type }) {
     const { dotIcons } = useTimelineContext();
     let itemIcon;
-    if (React.isValidElement(icon)) {
-        itemIcon = icon;
-    }
-    if (dotIcons[type] && !React.isValidElement(icon)) {
-        itemIcon = dotIcons[type];
+
+    if (dotIcons) {
+        if (React.isValidElement(icon)) {
+            itemIcon = icon;
+        }
+        if (dotIcons[type] && !React.isValidElement(icon)) {
+            itemIcon = dotIcons[type];
+        }
     }
     return (
         <li className="timeline-item">
@@ -134,3 +143,14 @@ Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type
 };
 
 export { Timeline };
+
+Timeline.propTypes = {
+    position: PropTypes.oneOf(['left', 'right']).isRequired,
+    timelineData: PropTypes.array,
+    partDataReload: PropTypes.bool,
+    dotIcons: PropTypes.object,
+    reverse: PropTypes.bool,
+    horizontal: PropTypes.bool,
+    timelineHorizontalWrap: PropTypes.bool,
+    children: PropTypes.node,
+}

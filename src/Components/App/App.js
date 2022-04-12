@@ -1,9 +1,9 @@
-import { Timeline } from "./Timeline";
-import timelineData from './database.json';
-import { ReactComponent as ClockIcon } from "./icons/clock.svg";
-import { ReactComponent as Bolt } from "./icons/uil_bolt.svg";
-import { ReactComponent as Smile } from "./icons/smile.svg";
-import { ReactComponent as Ticket } from "./icons/ticket.svg";
+import { Timeline } from "../Timeline/Timeline";
+import timelineData from '../../database.json';
+import { ReactComponent as ClockIcon } from "../../icons/clock.svg";
+import { ReactComponent as Bolt } from "../../icons/uil_bolt.svg";
+import { ReactComponent as Smile } from "../../icons/smile.svg";
+import { ReactComponent as Ticket } from "../../icons/ticket.svg";
 
 
 const App = () => {
@@ -21,9 +21,9 @@ const App = () => {
         partDataReload={false}
         reverse={false}
         horizontal={false}
-        timelineHorizontalWrap={true}
+        timelineHorizontalWrap={false}
       >
-        <Timeline.Item type={"edit"} >Deleted old feature service site 2015-09-01</Timeline.Item>
+        {/* <Timeline.Item type={"edit"} >Deleted old feature service site 2015-09-01</Timeline.Item>
         <Timeline.Item dotColor={"green"}>Deleted old feature service site 2015-09-02</Timeline.Item>
         <Timeline.Item type={"create"}>Deleted old feature service site 2015-09-03</Timeline.Item>
         <Timeline.Item type={"delete"}>Deleted old feature service site 2015-09-04</Timeline.Item>
@@ -40,7 +40,7 @@ const App = () => {
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
-        <Timeline.Item type={"edit"}>Beer</Timeline.Item>
+        <Timeline.Item type={"edit"}>Beer</Timeline.Item> */}
       </Timeline>
     </div>
   );
