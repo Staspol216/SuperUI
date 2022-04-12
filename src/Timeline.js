@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import cn from 'classnames';
 
 const TimelineContext = createContext();
@@ -15,11 +15,10 @@ const Timeline = ({ children, ...props }) => {
     const { position = "left",
         timelineData = [],
         partDataReload = false,
-        dotIcon = {},
+        dotIcons = {},
         reverse = false,
         horizontal = false,
         timelineHorizontalWrap = false } = props;
-
 
     const [eventsList, setEventsList] = useState([]);
     const [offset, setOffset] = useState(0);
@@ -27,14 +26,14 @@ const Timeline = ({ children, ...props }) => {
 
     useEffect(() => {
         if (reverse) timelineData.reverse();
-        partDataReload ? onLoadItems(timelineData, offset) : setEventsList(timelineData);
+        partDataReload && !children ? onLoadItems(timelineData, offset) : setEventsList(timelineData);
     }, [])
 
     const value = useMemo(
         () => ({
-            dotIcon
+            dotIcons
         }),
-        [dotIcon]
+        [dotIcons]
     );
 
     const onLoadItems = (arr, offset) => {
@@ -47,53 +46,88 @@ const Timeline = ({ children, ...props }) => {
         setEventsList(eventsList => [...eventsList, ...newEventsList]);
         setEventsEnded(ended);
     }
+
     const containerClass = cn("timeline-container", {
+        "timeline-container-left": position === "left" && !horizontal,
+        "timeline-container-right": position === "right" && !horizontal,
         "timeline-container-horizontal": horizontal,
         "timeline-wrap": timelineHorizontalWrap && horizontal
     });
 
-    const items = eventsList.map((data, idx) => (
-        <Timeline.Item
-            position={position}
-            data={data}
-            type={data.type}
-            key={idx}
-            lastItem={(eventsList.length - 1) === idx}
-            dotIcon={dotIcon}
-            horizontal={horizontal} />
-    ))
+    let dataItems;
+
+    if (!children) {
+        dataItems = eventsList.map((data, idx) => (
+            <Timeline.JSONItem
+                data={data}
+                key={idx}
+                lastItem={(eventsList.length - 1) === idx}
+            />
+        ))
+    } else {
+        children = React.Children.map(children, (child, i) => {
+            if (React.Children.count(children) === (i + 1)) {
+                return React.cloneElement(child, {
+                    lastItem: true
+                })
+            } else {
+                return child
+            }
+        });
+    }
 
     return (
         <TimelineContext.Provider value={value}>
             <div className="timeline-list">
                 <ul className={containerClass}>
-                    {items}
+                    {dataItems}
                     {children}
                 </ul>
                 <button
                     className={`button-timeline button-timeline-${position}`}
                     disabled={eventsEnded}
-                    style={{ "display": partDataReload ? "inline-block" : "none" }}
+                    style={{ "display": partDataReload && !children ? "inline-block" : "none" }}
                     onClick={() => onLoadItems(timelineData, offset)}>
                     <div className="btn-timeline-text"><span>More</span></div>
                 </button>
             </div>
         </TimelineContext.Provider>
-
     );
 }
 
-Timeline.Item = function TimelineItem({ data, lastItem, horizontal, position, type }) {
-    const { dotIcon } = useTimelineContext();
-
-    const headClass = cn("timeline-item-head", `timeline-item-head-${type ? type : "default"}`);
-
+Timeline.JSONItem = function TimelineJSONItem({ data, lastItem }) {
+    const { dotIcons } = useTimelineContext();
+    const headClass = cn("timeline-item-head", `timeline-item-head-${data.type ? data.type : "default"}`);
     return (
-        <li className={horizontal ? `timeline-item timeline-item-horizontal` : `timeline-item timeline-item-${position}`}>
+        <li className="timeline-item">
             {!lastItem ? <div className="timeline-item-tail"></div> : null}
-            {dotIcon[type] ? <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{dotIcon[type]}</span></div> : <div className={headClass} />}
+            {dotIcons[data?.type] ?
+                <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{dotIcons[data?.type]}</span></div>
+                : <div className={headClass} />}
             <div className="timeline-item-content">
-                {data?.content ? `${data?.content?.text} ${data?.content?.changes} ${data?.content?.name} ${data?.content?.date}` : "yolo"}
+                {`${data?.content?.text} ${data?.content?.changes} ${data?.content?.name} ${data?.date}`}
+            </div>
+        </li >
+    )
+}
+
+Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type }) {
+    const { dotIcons } = useTimelineContext();
+    let itemIcon;
+    if (React.isValidElement(icon)) {
+        itemIcon = icon;
+    }
+    if (dotIcons[type] && !React.isValidElement(icon)) {
+        itemIcon = dotIcons[type];
+    }
+    return (
+        <li className="timeline-item">
+            {!lastItem ? <div className="timeline-item-tail"></div> : null}
+            {itemIcon ?
+                <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{itemIcon}</span></div>
+                : <div className="timeline-item-head timeline-item-head-default" style={{ borderColor: dotColor }} />}
+            <div className="timeline-item-content">
+                {children}
             </div>
         </li >
     )
