@@ -55,6 +55,7 @@ export default {
 const Template = (args) => <Timeline {...args} />
 
 export const dataJSON = Template.bind({}) 
+
 dataJSON.args = {
     timelineData: timelineData,
     position: "left",
@@ -67,24 +68,13 @@ dataJSON.args = {
     partDataReload: false,
     reverse: false,
     horizontal: false,
-    timelineHorizontalWrap: true,
+    timelineHorizontalWrap: false,
 }
 
 export const dataChildren = Template.bind({});
 
 dataChildren.args = {
-    timelineData: timelineData,
-    position: "left",
-    dotIcons: {
-        create: <ClockIcon color="blue" />,
-        delete: <Smile color="red" />,
-        add: <Bolt color="green" />,
-        edit: <Ticket color="violet" />
-    },
-    partDataReload: false,
-    reverse: false,
-    horizontal: false,
-    timelineHorizontalWrap: true,
+    ...dataJSON.args,
     children: <>
         <Timeline.Item type={"edit"} >Deleted old feature service site 2015-09-01</Timeline.Item>
         <Timeline.Item dotColor={"green"}>Deleted old feature service site 2015-09-02</Timeline.Item>

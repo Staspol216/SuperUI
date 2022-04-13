@@ -23,7 +23,7 @@ const App = () => {
         horizontal={false}
         timelineHorizontalWrap={false}
       >
-        {/* <Timeline.Item type={"edit"} >Deleted old feature service site 2015-09-01</Timeline.Item>
+        <Timeline.Item>Deleted old feature service site 2015-09-01</Timeline.Item>
         <Timeline.Item dotColor={"green"}>Deleted old feature service site 2015-09-02</Timeline.Item>
         <Timeline.Item type={"create"}>Deleted old feature service site 2015-09-03</Timeline.Item>
         <Timeline.Item type={"delete"}>Deleted old feature service site 2015-09-04</Timeline.Item>
@@ -40,7 +40,7 @@ const App = () => {
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
-        <Timeline.Item type={"edit"}>Beer</Timeline.Item> */}
+        <Timeline.Item type={"edit"}>Beer</Timeline.Item>
       </Timeline>
     </div>
   );

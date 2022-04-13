@@ -3,16 +3,6 @@ import PropTypes from 'prop-types';
 import cn from 'classnames';
 import './Timeline.scss';
 
-const TimelineContext = createContext();
-
-const useTimelineContext = () => {
-    const context = useContext(TimelineContext);
-    if (!context) {
-        throw new Error("No context found for Timeline");
-    }
-    return context;
-}
-
 const Timeline = ({ children, ...props }) => {
     const { position = "left",
         timelineData = [],
@@ -30,13 +20,6 @@ const Timeline = ({ children, ...props }) => {
         if (reverse) timelineData.reverse();
         partDataReload && !children ? onLoadItems(timelineData, offset) : setEventsList(timelineData);
     }, [])
-
-    const value = useMemo(
-        () => ({
-            dotIcons
-        }),
-        [dotIcons]
-    );
 
     const onLoadItems = (arr, offset) => {
         let ended = false;
@@ -79,26 +62,25 @@ const Timeline = ({ children, ...props }) => {
     }
 
     return (
-        <TimelineContext.Provider value={value}>
-            <div className="timeline-list">
-                <ul className={containerClass}>
-                    {dataItems}
-                    {children}
-                </ul>
-                <button
-                    className={`button-timeline button-timeline-${position}`}
-                    disabled={eventsEnded}
-                    style={{ "display": partDataReload && !children ? "inline-block" : "none" }}
-                    onClick={() => onLoadItems(timelineData, offset)}>
-                    <div className="btn-timeline-text"><span>More</span></div>
-                </button>
-            </div>
-        </TimelineContext.Provider>
+
+        <div className="timeline-list">
+            <ul className={containerClass}>
+                {dataItems}
+                {children}
+            </ul>
+            <button
+                className={`button-timeline button-timeline-${position}`}
+                disabled={eventsEnded}
+                style={{ "display": partDataReload && !children ? "inline-block" : "none" }}
+                onClick={() => onLoadItems(timelineData, offset)}>
+                <div className="btn-timeline-text"><span>More</span></div>
+            </button>
+        </div>
+
     );
 }
 
-Timeline.JSONItem = function TimelineJSONItem({ data, lastItem }) {
-    const { dotIcons } = useTimelineContext();
+Timeline.ItemFromProps = function TimelineJSONItem({ data, lastItem, dotIcons }) {
     const headClass = cn("timeline-item-head", `timeline-item-head-${data.type ? data.type : "default"}`);
     let itemIcon;
 
@@ -117,8 +99,8 @@ Timeline.JSONItem = function TimelineJSONItem({ data, lastItem }) {
     )
 }
 
-Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type }) {
-    const { dotIcons } = useTimelineContext();
+Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type, dotIcons }) {
+    const headClass = cn("timeline-item-head", `timeline-item-head-${type ? type : "default"}`);
     let itemIcon;
 
     if (dotIcons) {
@@ -134,7 +116,7 @@ Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type
             {!lastItem ? <div className="timeline-item-tail"></div> : null}
             {itemIcon ?
                 <div className='timeline-item-head timeline-item-head-custom'><span className='timeline-icon'>{itemIcon}</span></div>
-                : <div className="timeline-item-head timeline-item-head-default" style={{ borderColor: dotColor }} />}
+                : <div className={headClass} style={{ borderColor: dotColor }} />}
             <div className="timeline-item-content">
                 {children}
             </div>
@@ -144,11 +126,23 @@ Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type
 
 export { Timeline };
 
+Timeline.Item.propTypes = {
+    lastItem: PropTypes.bool,
+    icon: PropTypes.element,
+    dotColor: PropTypes.string,
+    type: PropTypes.oneOf(['add', 'edit', 'delete', 'create']),
+}
+
 Timeline.propTypes = {
     position: PropTypes.oneOf(['left', 'right']).isRequired,
-    timelineData: PropTypes.array,
+    timelineData: PropTypes.arrayOf(PropTypes.object),
     partDataReload: PropTypes.bool,
-    dotIcons: PropTypes.object,
+    dotIcons: PropTypes.shape({
+        create: PropTypes.element,
+        delete: PropTypes.element,
+        add: PropTypes.element,
+        edit: PropTypes.element
+    }),
     reverse: PropTypes.bool,
     horizontal: PropTypes.bool,
     timelineHorizontalWrap: PropTypes.bool,
