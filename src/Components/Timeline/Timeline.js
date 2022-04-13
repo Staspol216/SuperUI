@@ -3,6 +3,18 @@ import PropTypes from 'prop-types';
 import cn from 'classnames';
 import './Timeline.scss';
 
+const TimelineContext = createContext(undefined);
+
+const useTimelineContext = () => {
+    const context = useContext(TimelineContext);
+
+    if (!context) {
+        throw new Error('This component must be used within a <AuthForm> component.');
+    }
+
+    return context;
+}
+
 const Timeline = ({ children, ...props }) => {
     const { position = "left",
         timelineData = [],
@@ -20,6 +32,10 @@ const Timeline = ({ children, ...props }) => {
         if (reverse) timelineData.reverse();
         partDataReload && !children ? onLoadItems(timelineData, offset) : setEventsList(timelineData);
     }, [])
+
+    const value = useMemo(
+        () => ({ dotIcons }), [dotIcons]
+    );
 
     const onLoadItems = (arr, offset) => {
         let ended = false;
@@ -43,9 +59,10 @@ const Timeline = ({ children, ...props }) => {
 
     if (!children && eventsList) {
         dataItems = eventsList.map((data, idx) => (
-            <Timeline.JSONItem
+            <TimelinePropsItem
                 data={data}
                 key={idx}
+                dotIcons={dotIcons}
                 lastItem={(eventsList.length - 1) === idx}
             />
         ))
@@ -62,25 +79,25 @@ const Timeline = ({ children, ...props }) => {
     }
 
     return (
-
-        <div className="timeline-list">
-            <ul className={containerClass}>
-                {dataItems}
-                {children}
-            </ul>
-            <button
-                className={`button-timeline button-timeline-${position}`}
-                disabled={eventsEnded}
-                style={{ "display": partDataReload && !children ? "inline-block" : "none" }}
-                onClick={() => onLoadItems(timelineData, offset)}>
-                <div className="btn-timeline-text"><span>More</span></div>
-            </button>
-        </div>
-
+        <TimelineContext.Provider value={value}>
+            <div className="timeline-list">
+                <ul className={containerClass}>
+                    {dataItems}
+                    {children}
+                </ul>
+                <button
+                    className={`button-timeline button-timeline-${position}`}
+                    disabled={eventsEnded}
+                    style={{ "display": partDataReload && !children ? "inline-block" : "none" }}
+                    onClick={() => onLoadItems(timelineData, offset)}>
+                    <div className="btn-timeline-text"><span>More</span></div>
+                </button>
+            </div>
+        </TimelineContext.Provider>
     );
 }
 
-Timeline.ItemFromProps = function TimelineJSONItem({ data, lastItem, dotIcons }) {
+const TimelinePropsItem = ({ data, lastItem, dotIcons }) => {
     const headClass = cn("timeline-item-head", `timeline-item-head-${data.type ? data.type : "default"}`);
     let itemIcon;
 
@@ -99,8 +116,9 @@ Timeline.ItemFromProps = function TimelineJSONItem({ data, lastItem, dotIcons })
     )
 }
 
-Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type, dotIcons }) {
+Timeline.Item = function TimelineItem({ lastItem, children, icon, dotColor, type }) {
     const headClass = cn("timeline-item-head", `timeline-item-head-${type ? type : "default"}`);
+    const { dotIcons } = useTimelineContext();
     let itemIcon;
 
     if (dotIcons) {
