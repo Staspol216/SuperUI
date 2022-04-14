@@ -1,4 +1,5 @@
 import { Timeline } from "../Timeline/Timeline";
+import { Tree } from '../Tree/Tree';
 import timelineData from '../../database.json';
 import { ReactComponent as ClockIcon } from "../../icons/clock.svg";
 import { ReactComponent as Bolt } from "../../icons/uil_bolt.svg";
@@ -9,7 +10,7 @@ import { ReactComponent as Ticket } from "../../icons/ticket.svg";
 const App = () => {
   return (
     <div className="App">
-      <Timeline
+      {/* <Timeline
         timelineData={timelineData}
         position={"left"}
         dotIcons={{
@@ -41,7 +42,12 @@ const App = () => {
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
         <Timeline.Item type={"edit"}>Beer</Timeline.Item>
-      </Timeline>
+      </Timeline> */}
+
+
+      <Tree />
+
+
     </div>
   );
 }

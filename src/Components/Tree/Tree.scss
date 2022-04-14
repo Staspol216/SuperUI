@@ -1,0 +1,152 @@
+* {
+    box-sizing: border-box;
+}
+
+.tree-wrapper {
+    margin: 40px;
+
+}
+
+.tree-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.tree-node {
+    padding: 0 0 0 24px;
+
+    overflow: hidden;
+}
+
+.tree-node-row {
+    display: flex;
+    padding-bottom: 4px;
+    align-items: flex-start;
+}
+
+.tree-checkbox {
+    position: relative;
+    top: initial;
+    margin: 4px 8px 0 0;
+
+    cursor: pointer;
+}
+
+.tree-checkbox-inner {
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 16px;
+    height: 16px;
+    direction: ltr;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    border-collapse: separate;
+    transition: all .3s;
+
+    // &::after {
+    //     position: absolute;
+    //     top: 50%;
+    //     left: 21.5%;
+    //     display: table;
+    //     width: 5.71428571px;
+    //     height: 9.14285714px;
+    //     border: 2px solid #fff;
+    //     border-top: 0;
+    //     border-left: 0;
+    //     transform: rotate(45deg) scale(0) translate(-50%,-50%);
+    //     opacity: 0;
+    //     transition: all .1s cubic-bezier(.71,-.46,.88,.6),opacity .1s;
+    //     content: " ";
+    // }
+}
+
+// .ant-tree-checkbox-checked .ant-tree-checkbox-inner {
+//     &::after {
+//         position: absolute;
+//         display: table;
+//         border: 2px solid #fff;
+//         border-top: 0;
+//         border-left: 0;
+//         transform: rotate(45deg) scale(1) translate(-50%,-50%);
+//         opacity: 1;
+//         transition: all .2s cubic-bezier(.12,.4,.29,1.46) .1s;
+//         content: " ";
+//     }
+// }
+
+// .tree-checkbox-checked {
+//     &::after {
+//         position: absolute;
+//         box-sizing: border-box;
+//         top: 0;
+//         left: 0;
+//         width: 100%;
+//         height: 100%;
+//         border-radius: 2px;
+//         visibility: hidden;
+//         content: "";
+//     }
+// }
+
+// .tree-checkbox-checked .tree-checkbox-inner {
+//     background-color: #1890ff;
+//     border-color: #1890ff;
+// }
+
+
+.tree-holder .tree-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.tree-icon {
+    display: inline-block;
+    position: relative;
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        transition: transform .3s;
+    }
+}
+
+.tree-switcher {
+    transform: rotate(-90deg);
+    position: relative;
+    width: 24px;
+    line-height: 24px;
+
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+
+    &.open {
+        transform: rotate(0);
+    }
+}
+
+.tree-switcher.empty .tree-icon {
+    display: none;
+}
+
+.tree-switcher .tree-icon {
+    width: 10px;
+    height: 10px;
+}
+
+
+.tree-content {
+    position: relative;
+    z-index: auto;
+    min-height: 24px;
+    padding: 0 4px;
+    line-height: 24px;
+    cursor: pointer;
+    user-select: none;
+}
