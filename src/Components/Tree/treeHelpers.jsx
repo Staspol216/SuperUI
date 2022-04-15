@@ -28,6 +28,8 @@ export const addUniqueIds = (tree) => {
   })
 }
 
+
+
 const findNodeByUniqueIdAndRemoveFromTree = (tree, currentTargetTree, targetUniqueId) => {
     let removedNode = currentTargetTree.find(node => node.uniqueId === targetUniqueId);
     let treeWithoutRemovedNode = tree.filter;

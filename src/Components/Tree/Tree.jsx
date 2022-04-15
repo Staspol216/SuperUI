@@ -50,54 +50,98 @@ const Tree = () => {
         setCurrentDragOverId(undefined);
     };
 
-    const handleChecked = (e) => {
-        console.log(e);
+
+    const handleCheckboxChange = (e) => {
+        const refreshTree = (tree, e) => {
+            return tree.map(node => {
+                if (+e.target.id === node.uniqueId) {
+                    node.checked = !node.checked
+                }
+                
+                const { contains, ...otherProps} = node;
+                const refreshedNode = {...otherProps, contains: []};
+
+                if (contains && contains?.length) {
+                    refreshedNode.contains = refreshTree(contains, e);
+                }
+
+                if (node?.contains?.length && node.checked) {
+                    node.contains.map(node => node.checked = true)
+                }
+
+                if (node?.contains?.length && node.checked === false) {
+                    node.contains.map(node => node.checked = false)
+                }
+                
+                return refreshedNode
+            })
+        }
+        const refreshedTree = refreshTree(tree, e);
+        setTree(refreshedTree);
     }
     
-    
     const buildTree = (tree) => {
+        
         const mappedNodes = tree.map(node => {
-        const isExpanded = expandedNodes.includes(node.uniqueId);
+            const isExpanded = expandedNodes.includes(node.uniqueId);
+            let {contains, name, checked, uniqueId } = node;
 
-        const switcherClass = cn("tree-switcher", {
-            "open": isExpanded && node.contains,
-            "empty": !node.contains?.length,
-        })
+            // let hasCheckedContains;
+            // let hasAllCheckedContains;
 
-        return (
-            <div 
-            key={node.uniqueId}
-            style={ isExpanded ? { height: 'auto'} : { height:'28px' }}
-            className="tree-node"
-            >
-                <div
-                data-unique-id={node.uniqueId}
-                draggable
-                onDragStart={handleDragStart}
-                onDragEnter={handleDragEnter}
-                onDragEnd={() => { handleDragEnd(tree) }}
-                className="tree-node-row">
+            // if (contains?.some(node => node.checked === true)) {
+            //     hasCheckedContains = true;
+            // } else {
+            //     hasCheckedContains = false;
+            // }
+
+            // if (contains?.every(node => node.checked === true)) {
+            //     hasAllCheckedContains = true;
+            // } else {
+            //     hasAllCheckedContains = false;
+            // }
+
+            const checkBoxClass = cn("tree-checkbox-wrapper", {
+                "tree-checkbox-checked-contains": false
+            })
+            const switcherClass = cn("tree-switcher", {
+                "open": isExpanded && node.contains,
+                "empty": !node.contains?.length,
+            })
+
+            return (
+                <div 
+                key={uniqueId}
+                style={ isExpanded ? { height: 'auto'} : { height:'28px' }}
+                className="tree-node"
+                >
                     <div
-                    data-unique-id={node.uniqueId}
-                    onClick={handleNodeExpand}
-                    className={switcherClass}>
-                        <span className="tree-icon">
-                            <Switcher />
+                    data-unique-id={uniqueId}
+                    draggable
+                    onDragStart={handleDragStart}
+                    onDragEnter={handleDragEnter}
+                    onDragEnd={() => { handleDragEnd(tree) }}
+                    className="tree-node-row">
+                        <div
+                        data-unique-id={uniqueId}
+                        onClick={handleNodeExpand}
+                        className={switcherClass}>
+                            <span className="tree-icon">
+                                <Switcher />
+                            </span>
+                        </div>
+                        <span className={checkBoxClass}>
+                            <input id={uniqueId} name={name} checked={checked} onChange={(e) => handleCheckboxChange(e)} type="checkbox" className="tree-checkbox" />
                         </span>
+                        <div className="tree-content">{name}</div>
                     </div>
-                    <span className="tree-checkbox">
-                        <input onChange={(e) => handleChecked(e)} type={"checkbox"} className="tree-checkbox-inner" />
-                    </span>
-                    <div className="tree-content">{node.name}</div>
-                </div>
-                {node.contains ? buildTree(node.contains) : null}
-            </div>  
-        )
+                    {node.contains ? buildTree(node.contains) : null}
+                </div>  
+            )
         })
 
         return mappedNodes;
     }
-
 
     return (
         <div className="tree-wrapper">
