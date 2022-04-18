@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-const TreeNode = ({id, isExpanded, onDrop, children}) => {
+const TreeNode = ({id, onDrop, children}) => {
 
     const [{isDragging}, drag] = useDrag(
         () => ({
@@ -26,8 +26,7 @@ const TreeNode = ({id, isExpanded, onDrop, children}) => {
     return (
         <div
         ref={node => drag(drop(node))}
-        style={isExpanded ? { height: 'auto'} : { height:'28px' }}
-        className="tree-node"
+        className="tree-node-row"
         >
             {children}
         </div>

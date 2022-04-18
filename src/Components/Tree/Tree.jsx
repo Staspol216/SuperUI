@@ -75,22 +75,22 @@ const Tree = () => {
                 "empty": !node?.contains?.length,
             })
             return (
-                <TreeNode
+                <div
                 key={uniqueId}
-                id={uniqueId}
-                isExpanded={isExpanded}
-                // onDrop={() => handleDrop(tree)}
+                style={isExpanded ? { height: 'auto'} : { height:'28px' }}
+                className="tree-node"
                 >
-                    <div
+                    <TreeNode
                     data-unique-id={uniqueId}
+                    id={uniqueId}
                     draggable
+                    // onDrop={() => handleDrop(tree)}
                     onDragStart={(e) => {
                         handleDragStart(e)
                         removeFromExpandedNodes(e)
                     }}
                     onDragEnter={handleDragEnter}
-                    onDragEnd={() => handleDrop(tree)}
-                    className="tree-node-row">
+                    onDragEnd={() => handleDrop(tree)}>
                         <div
                         data-unique-id={uniqueId}
                         onClick={handleNodeExpand}
@@ -103,9 +103,9 @@ const Tree = () => {
                             <input id={uniqueId} name={name} checked={checked} onChange={(e) => handleCheckboxChange(e)} type="checkbox" className="tree-checkbox" />
                         </span>
                         <div className="tree-content">{name}</div>
-                    </div>
+                    </TreeNode>
                     {node.contains ? buildTree(node.contains) : null}
-                </TreeNode>  
+                </div>  
             )
         })
 
