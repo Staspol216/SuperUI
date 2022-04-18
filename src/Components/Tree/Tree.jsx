@@ -1,12 +1,12 @@
 
 import './Tree.scss';
 import { ReactComponent as Switcher } from "../../icons/switcher.svg";
-import { ReactComponent as Holder } from "../../icons/holder.svg";
 import { treeData } from './treeDB';
 import { useEffect, useState } from 'react';
 import cn from 'classnames';
 
-import { addUniqueIds, moveNode } from './treeHelpers';
+import { addUniqueIds, moveNode, searchTargetNode } from './treeHelpers';
+import TreeNode from './TreeNode';
 
 
 const Tree = () => {
@@ -39,10 +39,11 @@ const Tree = () => {
         }
     };
 
-    const handleDragEnd = (currentTargetTree) => {
+    const handleDrop = (currentTargetTree) => {
         if (currentDraggingId !== currentDragOverId) {
             let newTree;
             newTree = moveNode(tree, currentTargetTree, currentDraggingId, currentDragOverId);
+            console.log(newTree);
             setTree(newTree);
         }
 
@@ -52,75 +53,43 @@ const Tree = () => {
 
 
     const handleCheckboxChange = (e) => {
-        const refreshTree = (tree, e) => {
-            return tree.map(node => {
-                if (+e.target.id === node.uniqueId) {
-                    node.checked = !node.checked
-                }
-                
-                const { contains, ...otherProps} = node;
-                const refreshedNode = {...otherProps, contains: []};
-
-                if (contains && contains?.length) {
-                    refreshedNode.contains = refreshTree(contains, e);
-                }
-
-                if (node?.contains?.length && node.checked) {
-                    node.contains.map(node => node.checked = true)
-                }
-
-                if (node?.contains?.length && node.checked === false) {
-                    node.contains.map(node => node.checked = false)
-                }
-                
-                return refreshedNode
-            })
-        }
-        const refreshedTree = refreshTree(tree, e);
+        const refreshedTree = searchTargetNode(tree, e);
         setTree(refreshedTree);
     }
+
+    const removeFromExpandedNodes = (e) => {
+        const filteredExpandedNodes = expandedNodes.filter(nodeUniqueId => nodeUniqueId !== +e.target.dataset.uniqueId)
+        setExpandedNodes(filteredExpandedNodes);
+    }
+
     
     const buildTree = (tree) => {
-        
         const mappedNodes = tree.map(node => {
-            const isExpanded = expandedNodes.includes(node.uniqueId);
-            let {contains, name, checked, uniqueId } = node;
-
-            // let hasCheckedContains;
-            // let hasAllCheckedContains;
-
-            // if (contains?.some(node => node.checked === true)) {
-            //     hasCheckedContains = true;
-            // } else {
-            //     hasCheckedContains = false;
-            // }
-
-            // if (contains?.every(node => node.checked === true)) {
-            //     hasAllCheckedContains = true;
-            // } else {
-            //     hasAllCheckedContains = false;
-            // }
-
+            let isExpanded = expandedNodes.includes(node.uniqueId);
+            let {name, checked, uniqueId, checkedContains } = node;
             const checkBoxClass = cn("tree-checkbox-wrapper", {
-                "tree-checkbox-checked-contains": false
+                "tree-checkbox-checked-contains": checkedContains && !checked
             })
             const switcherClass = cn("tree-switcher", {
                 "open": isExpanded && node.contains,
-                "empty": !node.contains?.length,
+                "empty": !node?.contains?.length,
             })
-
             return (
-                <div 
+                <TreeNode
                 key={uniqueId}
-                style={ isExpanded ? { height: 'auto'} : { height:'28px' }}
-                className="tree-node"
+                id={uniqueId}
+                isExpanded={isExpanded}
+                // onDrop={() => handleDrop(tree)}
                 >
                     <div
                     data-unique-id={uniqueId}
                     draggable
-                    onDragStart={handleDragStart}
+                    onDragStart={(e) => {
+                        handleDragStart(e)
+                        removeFromExpandedNodes(e)
+                    }}
                     onDragEnter={handleDragEnter}
-                    onDragEnd={() => { handleDragEnd(tree) }}
+                    onDragEnd={() => handleDrop(tree)}
                     className="tree-node-row">
                         <div
                         data-unique-id={uniqueId}
@@ -136,7 +105,7 @@ const Tree = () => {
                         <div className="tree-content">{name}</div>
                     </div>
                     {node.contains ? buildTree(node.contains) : null}
-                </div>  
+                </TreeNode>  
             )
         })
 

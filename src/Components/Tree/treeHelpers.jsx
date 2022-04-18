@@ -11,7 +11,7 @@ const generateUniqueId = () => {
   }
 }
 
-export const addUniqueIds = (tree) => {
+const addUniqueIds = (tree) => {
   if (!tree) return []
 
   return tree.map((node) => {
@@ -30,18 +30,18 @@ export const addUniqueIds = (tree) => {
 
 
 
-const findNodeByUniqueIdAndRemoveFromTree = (tree, currentTargetTree, targetUniqueId) => {
+const removeDraggedNodeFromTree = (tree, currentTargetTree, targetUniqueId) => {
     let removedNode = currentTargetTree.find(node => node.uniqueId === targetUniqueId);
-    let treeWithoutRemovedNode = tree.filter;
+    let filtredTree;
 
     const walkOnTree = (tree, targetUniqueId) => {
-      const filteredTree = tree.filter(node => node.uniqueId !== targetUniqueId);
+      const refreshedTree = tree.filter(node => node.uniqueId !== targetUniqueId);
 
-      return filteredTree.map((node) => {
+      return refreshedTree.map(node => {
         const { contains, ...nodeWithoutContains } = node
   
         const returnObj = { ...nodeWithoutContains, contains: [] }
-  
+
         if (contains) {
           returnObj.contains = walkOnTree(contains, targetUniqueId)
         }
@@ -50,44 +50,79 @@ const findNodeByUniqueIdAndRemoveFromTree = (tree, currentTargetTree, targetUniq
       })
     }
   
-    treeWithoutRemovedNode = walkOnTree(tree, targetUniqueId)
+    filtredTree = walkOnTree(tree, targetUniqueId)
   
-    return [ removedNode, treeWithoutRemovedNode ]
+    return [ removedNode, filtredTree ]
 }
 
-const insertGivenNodeIntoNodeWithGivenUniqueId = (tree, nodeToInsert, whereToInsertUniqueId) => {
-    const walkOnTree = (tree, nodeToInsert, whereToInsertUniqueId) => {
-      return tree.map((node) => {
+const insertNodeInNewTree = (tree, nodeToInsert, insertTargetId) => {
+    const walkOnTree = (tree, nodeToInsert, insertTargetId) => {
+      return tree.map(node => {
         const { contains, ...nodeWithoutContains } = node
   
         const newNodeState = { ...nodeWithoutContains, contains: [] }
   
-        if (node.uniqueId === whereToInsertUniqueId) {
+        if (node.uniqueId === insertTargetId) {
           newNodeState.contains = [
             ...contains,
             nodeToInsert,
           ]
         } else if (contains && contains.length) {
-          newNodeState.contains = walkOnTree(contains, nodeToInsert, whereToInsertUniqueId)
+          newNodeState.contains = walkOnTree(contains, nodeToInsert, insertTargetId)
         }
   
         return newNodeState
       })
     }
   
-    return walkOnTree(tree, nodeToInsert, whereToInsertUniqueId)
+    return walkOnTree(tree, nodeToInsert, insertTargetId)
   }
 
 
-export const moveNode = (tree, currentTargetTree, draggingItem, absorberItem) => {
+const moveNode = (tree, currentTargetTree, draggingItemId, dragOverItemId) => {
     const [
-        nodeWithGivenUniqueId,
-        treeWithoutNodeWithGivenUniqueId
-      ] = findNodeByUniqueIdAndRemoveFromTree(tree, currentTargetTree, draggingItem)
+        removedNode,
+        filtredTree
+      ] = removeDraggedNodeFromTree(tree, currentTargetTree, draggingItemId)
     
-      return insertGivenNodeIntoNodeWithGivenUniqueId(
-        treeWithoutNodeWithGivenUniqueId,
-        nodeWithGivenUniqueId,
-        absorberItem
+      return insertNodeInNewTree(
+        filtredTree,
+        removedNode,
+        dragOverItemId
       )
 }
+
+
+const refreshContainsTree = (tree, parentNodeStatus) => {
+  return tree.map(node => {
+      node.checked = parentNodeStatus
+      if (node?.contains?.length) {
+          node.contains = refreshContainsTree(node.contains, parentNodeStatus);
+      }
+      node.checkedContains = false;
+      return node
+  })
+}
+
+const searchTargetNode = (tree, e) => {
+  return tree.map(node => {
+      if (+e.target.id === node.uniqueId) {
+          node.checked = !node.checked
+          if (node?.contains?.length) {
+              node.contains = refreshContainsTree(node.contains, node.checked);
+          }
+          node.checkedContains = false;
+      } else {
+          if (node?.contains?.length) {
+              node.contains = searchTargetNode(node.contains, e)
+          }
+          node.checkedContains = node?.contains?.some(node => node.checked === true) || node?.contains?.some(node => node.checkedContains === true);
+      }
+      if (node?.contains?.length && node?.contains?.every(node => node.checked === true)) {
+          node.checked = true
+      }
+      return node
+  })
+}
+
+export { searchTargetNode, moveNode, addUniqueIds }
