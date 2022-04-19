@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-const TreeNode = ({ id, onDrop, moveItem, children }) => {
+const TreeNode = ({ id, onDrop, moveNode, collapseNode, children }) => {
 
-    const [{ isDragging }, drag] = useDrag(
+    const [, drag] = useDrag(
         () => ({
             type: 'task',
             item: { id },
@@ -13,24 +13,28 @@ const TreeNode = ({ id, onDrop, moveItem, children }) => {
                 const { id } = item;
                 const { uniqueId } = dropResult;
                 if (didDrop && uniqueId !== id) {
-                    moveItem(id, uniqueId)
+                    moveNode(id, uniqueId)
                 }
             }
         }),
-        [id]
+        []
     )
 
-    const [{ canDrop, isOver }, drop] = useDrop({
-        accept: 'task',
-        drop: onDrop,
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop(),
+    const [{ canDrop, isOver }, drop] = useDrop(
+        () => ({
+            accept: 'task',
+            drop: onDrop,
+            collect: (monitor) => ({
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop(),
         }),
-    })
+    }),
+    []
+    )
     return (
         <div
             ref={node => drag(drop(node))}
+            onDragStart={collapseNode}
             className="tree-node-row"
         >
             {children}

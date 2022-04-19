@@ -5,7 +5,7 @@ import { treeData } from './treeDB';
 import { useEffect, useState } from 'react';
 import cn from 'classnames';
 
-import { addUniqueIds, moveNode, searchTargetNode } from './treeHelpers';
+import { addUniqueIds, createNewTree, refreshCheckBoxState } from './treeHelpers';
 import TreeNode from './TreeNode';
 
 
@@ -20,22 +20,23 @@ const Tree = () => {
     }
 
     useEffect(() => {
-        setTree(addUniqueIds(treeData))
+       setTree(addUniqueIds(treeData))
     }, [])
-
-    const moveItem = (currentTargetTree, draggingId, dragOverId) => {
-        let newTree;
-        newTree = moveNode(tree, currentTargetTree, draggingId, dragOverId);
+    
+    
+    const moveNode = (currentTargetTree, draggingId, dragOverId) => {
+        const newTree = createNewTree(tree, currentTargetTree, draggingId, dragOverId);
+        console.log(newTree);
         setTree(newTree);
     };
 
-    const handleCheckboxChange = (e) => {
-        const refreshedTree = searchTargetNode(tree, e);
+    const handleCheckboxChange = (id) => {
+        const refreshedTree = refreshCheckBoxState(tree, id);
         setTree(refreshedTree);
     }
 
-    const removeFromExpandedNodes = (e) => {
-        const filteredExpandedNodes = expandedNodes.filter(nodeUniqueId => nodeUniqueId !== e.id)
+    const collapseNode = (id) => {
+        const filteredExpandedNodes = expandedNodes.filter(nodeUniqueId => nodeUniqueId !== id)
         setExpandedNodes(filteredExpandedNodes);
     }
 
@@ -57,13 +58,11 @@ const Tree = () => {
                     className="tree-node"
                 >
                     <TreeNode
-                        data-unique-id={uniqueId}
                         id={uniqueId}
-                        draggable
                         onDrop={() => ({ uniqueId })}
-                        moveItem={(draggingId, dragOverId) => moveItem(tree, draggingId, dragOverId)}
-                        removeFromExpandedNodes={removeFromExpandedNodes}
-                    >
+                        moveNode={(draggingId, dragOverId) => moveNode(tree, draggingId, dragOverId)}
+                        collapseNode={() => collapseNode(uniqueId)}
+                        >
                         <div
                             data-unique-id={uniqueId}
                             onClick={handleNodeExpand}
@@ -73,7 +72,7 @@ const Tree = () => {
                             </span>
                         </div>
                         <span className={checkBoxClass}>
-                            <input id={uniqueId} name={name} checked={checked} onChange={(e) => handleCheckboxChange(e)} type="checkbox" className="tree-checkbox" />
+                            <input id={uniqueId} name={name} checked={checked} onChange={() => handleCheckboxChange(uniqueId)} type="checkbox" className="tree-checkbox" />
                         </span>
                         <div className="tree-content">{name}</div>
                     </TreeNode>

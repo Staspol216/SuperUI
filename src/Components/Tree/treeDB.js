@@ -14,10 +14,12 @@ export const treeData = [
               {
                 name: "Гос.номера",
                 checked: false,
+                contains: [],
               },
               {
                 name: "Лица",
                 checked: false,
+                contains: [],
               }
             ]
           },
@@ -28,10 +30,12 @@ export const treeData = [
               {
                 name: "Гос.номера",
                 checked: false,
+                contains: [],
               },
               {
                 name: "Лица",
                 checked: false,
+                contains: [],
               }
             ]
           }
@@ -48,10 +52,12 @@ export const treeData = [
               {
                 name: "Гос.номера",
                 checked: false,
+                contains: [],
               },
               {
                 name: "Лица",
                 checked: false,
+                contains: [],
               }
             ]
           },
@@ -62,10 +68,12 @@ export const treeData = [
               {
                 name: "Гос.номера",
                 checked: false,
+                contains: [],
               },
               {
                 name: "Лица",
                 checked: false,
+                contains: [],
               }
             ]
           }
@@ -78,10 +86,12 @@ export const treeData = [
           {
             name: "Гос.номера",
             checked: false,
+            contains: [],
           },
           {
             name: "Лица",
             checked: false,
+            contains: [],
           }
         ]
       },
@@ -92,10 +102,12 @@ export const treeData = [
           {
             name: "Гос.номера",
             checked: false,
+            contains: [],
           },
           {
             name: "Лица",
             checked: false,
+            contains: [],
           }
         ]
       }
@@ -112,10 +124,12 @@ export const treeData = [
           {
             name: "Гос.номера",
             checked: false,
+            contains: [],
           },
           {
             name: "Лица",
             checked: false,
+            contains: []
           }
         ]
       }

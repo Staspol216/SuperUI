@@ -28,29 +28,32 @@ const addUniqueIds = (tree) => {
   })
 }
 
+// const loop = (tree, callback) => {
+//   return tree.map(node => {
+//     if ()
+//   })
+// }
+
 
 
 const removeDraggedNodeFromTree = (tree, currentTargetTree, targetUniqueId) => {
-    let removedNode = currentTargetTree.find(node => node.uniqueId === targetUniqueId);
-    let filtredTree;
+    const removedNode = currentTargetTree.find(node => node.uniqueId === targetUniqueId);
 
     const walkOnTree = (tree, targetUniqueId) => {
+
       const refreshedTree = tree.filter(node => node.uniqueId !== targetUniqueId);
 
       return refreshedTree.map(node => {
-        const { contains, ...nodeWithoutContains } = node
-  
-        const returnObj = { ...nodeWithoutContains, contains: [] }
-
-        if (contains) {
-          returnObj.contains = walkOnTree(contains, targetUniqueId)
-        }
-  
-        return returnObj
+          if (node.contains.length) {
+            node.contains = walkOnTree(node.contains, targetUniqueId)
+          }
+          node.checkedContains = node?.contains?.some(node => node.checked === true) || node?.contains?.some(node => node.checkedContains === true);
+        
+        return node
       })
     }
   
-    filtredTree = walkOnTree(tree, targetUniqueId)
+    const filtredTree = walkOnTree(tree, targetUniqueId);
   
     return [ removedNode, filtredTree ]
 }
@@ -58,20 +61,15 @@ const removeDraggedNodeFromTree = (tree, currentTargetTree, targetUniqueId) => {
 const insertNodeInNewTree = (tree, nodeToInsert, insertTargetId) => {
     const walkOnTree = (tree, nodeToInsert, insertTargetId) => {
       return tree.map(node => {
-        const { contains, ...nodeWithoutContains } = node
-  
-        const newNodeState = { ...nodeWithoutContains, contains: [] }
-  
-        if (node.uniqueId === insertTargetId) {
-          newNodeState.contains = [
-            ...contains,
-            nodeToInsert,
-          ]
-        } else if (contains && contains.length) {
-          newNodeState.contains = walkOnTree(contains, nodeToInsert, insertTargetId)
+        let { contains, uniqueId } = node;
+
+        if (uniqueId === insertTargetId ) {
+            contains.push(nodeToInsert)
         }
-  
-        return newNodeState
+        if (uniqueId !== insertTargetId && contains.length) {
+          contains = walkOnTree(contains, nodeToInsert, insertTargetId)
+        }
+        return node
       })
     }
   
@@ -79,45 +77,49 @@ const insertNodeInNewTree = (tree, nodeToInsert, insertTargetId) => {
   }
 
 
-const moveNode = (tree, currentTargetTree, draggingItemId, dragOverItemId) => {
+const createNewTree = (tree, currentTargetTree, draggingItemId, dragOverItemId) => {
     const [
         removedNode,
         filtredTree
       ] = removeDraggedNodeFromTree(tree, currentTargetTree, draggingItemId)
+
+      const treeWithNewNode = insertNodeInNewTree(filtredTree, removedNode, dragOverItemId)
     
-      return insertNodeInNewTree(
-        filtredTree,
-        removedNode,
-        dragOverItemId
-      )
+      return refreshCheckBoxState(treeWithNewNode, draggingItemId, true)
 }
 
 
-const refreshContainsTree = (tree, parentNodeStatus) => {
+const refreshContainsTree = (tree, parentNodeStatus, checkboxRefreshByMoved) => {
   return tree.map(node => {
+    if (!checkboxRefreshByMoved) {
       node.checked = parentNodeStatus
-      if (node?.contains?.length) {
-          node.contains = refreshContainsTree(node.contains, parentNodeStatus);
-      }
-      node.checkedContains = false;
-      return node
+    }
+    if (node?.contains?.length) {
+      node.contains = refreshContainsTree(node.contains, parentNodeStatus);
+    }
+    node.checkedContains = false
+    return node
   })
 }
 
-const searchTargetNode = (tree, e) => {
+const refreshCheckBoxState = (tree, targetId, checkboxRefreshByMoved = false) => {
   return tree.map(node => {
-      if (+e.target.id === node.uniqueId) {
+      let { checked } = node;
+      if (targetId === node.uniqueId) {
+        if (!checkboxRefreshByMoved) {
           node.checked = !node.checked
-          if (node?.contains?.length) {
-              node.contains = refreshContainsTree(node.contains, node.checked);
-          }
-          node.checkedContains = false;
+        }
+        if (node?.contains?.length) {
+            node.contains = refreshContainsTree(node.contains, node.checked, checkboxRefreshByMoved);
+        }
+        node.checkedContains = false
       } else {
           if (node?.contains?.length) {
-              node.contains = searchTargetNode(node.contains, e)
+              node.contains = refreshCheckBoxState(node.contains, targetId, checkboxRefreshByMoved)
           }
           node.checkedContains = node?.contains?.some(node => node.checked === true) || node?.contains?.some(node => node.checkedContains === true);
       }
+
       if (node?.contains?.length && node?.contains?.every(node => node.checked === true)) {
           node.checked = true
       }
@@ -125,4 +127,4 @@ const searchTargetNode = (tree, e) => {
   })
 }
 
-export { searchTargetNode, moveNode, addUniqueIds }
+export { refreshCheckBoxState, createNewTree, addUniqueIds }
